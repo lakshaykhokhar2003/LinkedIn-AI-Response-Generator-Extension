@@ -1,91 +1,49 @@
-import React, {useState} from "react";
-import Wand from "@/entrypoints/popup/Wand.tsx";
-import Down from "@/entrypoints/popup/Down.tsx";
-import Refresh from "@/entrypoints/popup/Refresh.tsx";
-import Send from "@/entrypoints/popup/Send.tsx";
+import React from "react";
+import Wand from "@/entrypoints/popup/Svg/Wand.tsx";
+import Down from "@/entrypoints/popup/Svg/Down.tsx";
+import Refresh from "@/entrypoints/popup/Svg/Refresh.tsx";
+import Send from "@/entrypoints/popup/Svg/Send.tsx";
+import useExtension from "@/entrypoints/popup/hooks/extensionHook.tsx";
 
 const App = () => {
-    const [prompt, setPrompt] = useState('');
-    const [response, setResponse] = useState('');
-    const [showModal, setShowModal] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [showResponse, setShowResponse] = useState(false);
-    const [isRegenerate, setIsRegenerate] = useState(false); // New state for button
-
-    let Placeholder = 'Your Prompt';
-    const generateResponse = async () => {
-        if (prompt.trim() === '') Placeholder = 'Please enter a prompt';
-
-        setLoading(true);
-        setShowResponse(true);
-        setIsRegenerate(true);
-        try {
-            const result = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${import.meta.env.VITE_API_KEY}`,
-                },
-                body: JSON.stringify({
-                    model: 'llama-3.1-8b-instant',
-                    messages: [
-                        {
-                            role: "system",
-                            content: "You are a helpful assistant, also known as a chatbot, assist and give advice to users as they want."
-                        },
-                        {
-                            role: "user",
-                            content: prompt
-                        }
-                    ],
-                    max_tokens: 100,
-                }),
-            });
-            const data = await result.json();
-            setResponse(data.choices[0].message.content);
-        } catch (error) {
-            console.error(error);
-            setResponse('Error generating response');
-        } finally {
-            setLoading(false);
-            Placeholder = 'Your Prompt';
-        }
-    };
-
-    const insertResponse = async () => {
-        await chrome.runtime.sendMessage({action: 'insertMessage', content: response});
-        closeModal();
-    };
-
-    const closeModal = () => {
-        setPrompt('');
-        setResponse('');
-        setShowResponse(false);
-        setIsRegenerate(false);
-        setShowModal(false);
-    };
+    const {
+        prompt,
+        response,
+        showModal,
+        setShowModal,
+        loading,
+        showResponse,
+        isRegenerate,
+        placeholderError,
+        generateResponse,
+        insertResponse,
+        closeModal,
+        changeInput
+    } = useExtension();
 
 
     return (
         <div className="p-4">
-            <div
+            {/* Floating Action Button */}
+            <button
                 onClick={() => setShowModal(true)}
                 className="absolute bottom-4 right-2 bg-white p-2 rounded-full cursor-pointer z-10"
             >
                 <Wand/>
-            </div>
+            </button>
+
+            {/* Modal */}
             {showModal && (
                 <div
                     className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center outline-none"
-                    onClick={closeModal}
-                >
+                    onClick={closeModal}>
                     <div
                         className="relative bg-white p-4 rounded-lg mx-auto w-full max-w-[320px] overflow-hidden"
                         onClick={(e) => e.stopPropagation()}
                         onKeyDown={(e) => {
                             if (e.key === 'Escape') closeModal();
-                        }}
-                    >
+                        }}>
+                        {/* Response */}
                         {showResponse && (
                             <div className="flex flex-col space-y-4 mt-4 tracking-normal">
                                 {/* User's Typed Message */}
@@ -105,24 +63,29 @@ const App = () => {
 
                         )}
 
+                        {/* Input Field */}
                         <input
                             disabled={isRegenerate}
                             type="text"
-                            onChange={(e) => setPrompt(e.target.value)}
-                            className="w-full p-2 mt-4 outline-none border border-gray-300 rounded"
-                            placeholder={Placeholder}
+                            onChange={changeInput}
+                            className={`w-full p-2 mt-2 border-solid border border-gray-300 rounded-lg ${placeholderError ? 'border-red-500' : ''}`}
+                            placeholder="Your Prompt"
                             onKeyDown={async (e) => {
                                 if (e.key === 'Enter') await generateResponse();
                             }}
                         />
+
+                        {/* Error Message */}
+                        {placeholderError && <p className="mt-2 text-red-500 text-sm">Prompt cannot be empty</p>}
+
+                        {/* Buttons */}
                         <div className="flex justify-end gap-5 mt-4">
                             {(response && showResponse) && (
                                 <button
                                     onClick={insertResponse}
                                     className="flex flex-row justify-center items-center text-gray-500 border-solid border border-gray-600 font-semibold px-2 py-1 rounded-lg"
                                 >
-                                    <Down/>
-                                    Insert
+                                    <Down/> Insert
                                 </button>
                             )}
                             <button
