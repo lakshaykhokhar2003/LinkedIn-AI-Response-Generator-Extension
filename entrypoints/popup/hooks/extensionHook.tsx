@@ -2,20 +2,20 @@ import React, {useState} from 'react'
 import axios from "axios";
 
 const useExtension = () => {
-    const [prompt, setPrompt] = useState('');
-    const [response, setResponse] = useState('');
-    const [showModal, setShowModal] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [showResponse, setShowResponse] = useState(false);
-    const [isRegenerate, setIsRegenerate] = useState(false);
-    const [placeholderError, setPlaceholderError] = useState(false);
+    const [prompt, setPrompt] = useState<string>('');
+    const [response, setResponse] = useState<string>('');
+    const [showModal, setShowModal] = useState<boolean>(false);
+    const [loading, setLoading] =  useState<boolean>(false);
+    const [responseDiv, setResponseDiv] =  useState<boolean>(false);
+    const [isRegenerate, setIsRegenerate] =  useState<boolean>(false);
+    const [promptError, setPromptError] =  useState<boolean>(false);
 
     {/* Generate response from Groq API */}
     const generateResponse = async () => {
-        if (prompt.trim() === '') return setPlaceholderError(true);
+        if (prompt.trim() === '') return setPromptError(true);
 
         setLoading(true);
-        setShowResponse(true);
+        setResponseDiv(true);
         setIsRegenerate(true);
 
         try {
@@ -58,7 +58,7 @@ const useExtension = () => {
     const closeModal = () => {
         setPrompt('');
         setResponse('');
-        setShowResponse(false);
+        setResponseDiv(false);
         setIsRegenerate(false);
         setShowModal(false);
     };
@@ -66,7 +66,7 @@ const useExtension = () => {
     {/* Change input field value */}
     const changeInput = (e:React.ChangeEvent<HTMLInputElement>) => {
         setPrompt(e.target.value)
-        setPlaceholderError(false);
+        setPromptError(false);
     }
 
     return {
@@ -75,9 +75,9 @@ const useExtension = () => {
         showModal,
         setShowModal,
         loading,
-        showResponse,
+        showResponse: responseDiv,
         isRegenerate,
-        placeholderError,
+        placeholderError: promptError,
         generateResponse,
         insertResponse,
         closeModal,
