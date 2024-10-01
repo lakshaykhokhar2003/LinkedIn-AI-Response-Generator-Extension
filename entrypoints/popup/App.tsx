@@ -23,7 +23,7 @@ const App = () => {
 
 
     return (
-        <div className="p-4">
+        <div className="p-4 tracking-normal">
             {/* Floating Action Button */}
             <button
                 onClick={() => setShowModal(true)}
@@ -38,17 +38,17 @@ const App = () => {
                     className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center outline-none"
                     onClick={closeModal}>
                     <div
-                        className="relative bg-white p-4 rounded-lg mx-auto w-full max-w-[320px] overflow-hidden"
+                        className="relative bg-white p-4 rounded-lg mx-auto w-full max-w-[400px] overflow-hidden"
                         onClick={(e) => e.stopPropagation()}
                         onKeyDown={(e) => {
                             if (e.key === 'Escape') closeModal();
                         }}>
                         {/* Response */}
                         {showResponse && (
-                            <div className="flex flex-col space-y-4 mt-4 tracking-normal">
+                            <div className="flex flex-col mt-4 mb-4 gap-5">
                                 {/* User's Typed Message */}
                                 <div className="max-w-[75%] w-auto p-4 rounded-lg bg-gray-200 self-end">
-                                    {prompt && <p className="text-gray-500">{prompt}</p>}
+                                    {prompt && <p className="text-gray-500 break-words">{prompt}</p>}
                                 </div>
 
                                 {/* AI Response */}
@@ -60,7 +60,6 @@ const App = () => {
                                     )}
                                 </div>
                             </div>
-
                         )}
 
                         {/* Input Field */}
