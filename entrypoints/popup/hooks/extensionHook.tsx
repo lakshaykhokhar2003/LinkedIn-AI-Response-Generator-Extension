@@ -5,12 +5,13 @@ const useExtension = () => {
     const [prompt, setPrompt] = useState<string>('');
     const [response, setResponse] = useState<string>('');
     const [showModal, setShowModal] = useState<boolean>(false);
-    const [loading, setLoading] =  useState<boolean>(false);
-    const [responseDiv, setResponseDiv] =  useState<boolean>(false);
-    const [isRegenerate, setIsRegenerate] =  useState<boolean>(false);
-    const [promptError, setPromptError] =  useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [responseDiv, setResponseDiv] = useState<boolean>(false);
+    const [isRegenerate, setIsRegenerate] = useState<boolean>(false);
+    const [promptError, setPromptError] = useState<boolean>(false);
 
-    {/* Generate response from Groq API */}
+    {/* Generate response from Groq API */
+    }
     const generateResponse = async () => {
         if (prompt.trim() === '') return setPromptError(true);
 
@@ -24,14 +25,17 @@ const useExtension = () => {
                 messages: [
                     {
                         role: "system",
-                        content: "You are a helpful assistant, also known as a chatbot, assist and give advice to users as they want."
+                        content: `You are a professional writing assistant specialized in generating formal, concise, and polite LinkedIn message responses. 
+                        Your responses should be structured for a professional context, using clear and respectful language. 
+                        Focus on providing helpful advice, suggestions, and appropriate responses to a variety of professional inquiries or conversations. 
+                        Make sure the tone is business-appropriate, polite, and avoids being overly casual or informal.`
                     },
                     {
                         role: "user",
                         content: prompt
                     }
                 ],
-                max_tokens: 100,
+                max_tokens: 200,
             }, {
                 headers: {
                     'Content-Type': 'application/json',
@@ -48,13 +52,15 @@ const useExtension = () => {
         }
     };
 
-    {/* Insert response into LinkedIn message input field */}
+    {/* Insert response into LinkedIn message input field */
+    }
     const insertResponse = async () => {
         await chrome.runtime.sendMessage({action: 'insertMessage', content: response});
         closeModal();
     };
 
-    {/* Close modal */}
+    {/* Close modal */
+    }
     const closeModal = () => {
         setPrompt('');
         setResponse('');
@@ -63,8 +69,9 @@ const useExtension = () => {
         setShowModal(false);
     };
 
-    {/* Change input field value */}
-    const changeInput = (e:React.ChangeEvent<HTMLInputElement>) => {
+    {/* Change input field value */
+    }
+    const changeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         setPrompt(e.target.value)
         setPromptError(false);
     }
