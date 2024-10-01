@@ -4,7 +4,6 @@ module.exports = {
         '../chunks/**/*.{js,ts,jsx,tsx,html}',
         './chunks/**/*.{js,ts,jsx,tsx,html}',
         '../popup.html',
-        './**/*.{html,js}',
     ],
 
     theme: {
